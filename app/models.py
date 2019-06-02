@@ -1,44 +1,23 @@
 # coding:utf8
+from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-import datetime
+import pymysql
 
 # Instance Flask
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:root@127.0.0.1:3360/movie"
+app.config["SQLALCHEMY_DATABASE_URI"]        = "mysql+pymysql://wluo@wasuwikisvr:Bgq_StJwpoCkzqot2gV9@wasuwikisvr.mysql.database.chinacloudapi.cn:3306/wasuwiki"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 
 # Instance SQLAlchemy
 db = SQLAlchemy(app)
 
-
 class User(db.Model):
     __tablename__ = "user"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True)
-    pwd = db.Column(db.String(100))
-    email = db.Column(db.String(100), unique=True)
-    phone = db.Column(db.String(11), unique=True)
-    info = db.Column(db.Text)
-    face = db.Column(db.String(255), unique=True)
-    addtime = db.Column(db.DateTime, index=True, default=datetime.now)
-    uuid = db.Column(db.String(255), unique=True)
-    userlog = db.relationship("Userlog", backref="user")
+    id       = db.Column(db.Integer,  primary_key=True)
+    username = db.Column(db.String(20),  nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    addtime  = db.Column(db.DateTime,    nullable=False, default=datetime.now)
 
-    def __repr__(self):
-        return "<User %r>" % self.name
-
-    def check_pwd(self, pwd):
-        from werkzeug.security import check_password_hash
-        return check_password_hash(self.pwd, pwd)
-
-
-class Userlog(db.Model):
-    __tablename__ = "userlog"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    ip = db.Column(db.String(100))
-    addtime = db.Column(db.DateTime, index=True, default=datetime.now)
-
-    def __repr__(self):
-        return "<Userlog %r>" % self.id
+if __name__ == "__main__":
+    db.create_all()
